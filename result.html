@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>결과</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFN9HYKG8Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SFN9HYKG8Q', { debug_mode: true });
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="center">
+        <h2 class="h2">결과</h2>
+        <p id="resultText" class="lead"></p>
+
+        <div id="ctaArea" class="ctaWrap" style="margin-top:14px;"></div>
+        <div id="variantHint" class="variantHint"></div>
+      </div>
+
+      <div id="mbtiBars" class="barList"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    initExperiment();
+
+    // 1) MBTI 결과 가져오기
+    const mbti = sessionStorage.getItem("hp_mbti_v1");
+
+    // 2) 점수(score) 가져오기 (있으면)
+    const scoreRaw = sessionStorage.getItem("hp_score_v1");
+    const score = scoreRaw ? JSON.parse(scoreRaw) : null;
+
+    // 3) 결과 텍스트 출력
+    const resultEl = document.getElementById('resultText');
+
+    if (!mbti) {
+      resultEl.textContent = "테스트 결과를 찾을 수 없습니다. 다시 테스트를 진행해주세요.";
+    } else {
+      // score가 있으면 같이 보여주기 (선택)
+      if (score) {
+        resultEl.innerHTML = `
+          당신의 연애 MBTI는 <b>${mbti}</b> 입니다!<br/>
+        `;
+      } else {
+        resultEl.innerHTML = `당신의 연애 MBTI는 <b>${mbti}</b> 입니다!`;
+      }
+    }
+    if (score) {
+      const bars = [
+        { key: 'EI', left: 'E', right: 'I' },
+        { key: 'NS', left: 'N', right: 'S' },
+        { key: 'TF', left: 'T', right: 'F' },
+        { key: 'JP', left: 'J', right: 'P' },
+      ];
+
+      document.getElementById('mbtiBars').innerHTML = bars.map(b => {
+        const left = score[b.key][b.left];
+        const right = score[b.key][b.right];
+
+        return `
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px;">
+              <span>${b.left}</span>
+              <span>${b.right}</span>
+            </div>
+            <div style="background:#eee; height:10px; border-radius:6px; overflow:hidden;">
+              <div style="
+                width:${left}%;
+                background:#e63946;
+                height:100%;
+              "></div>
+            </div>
+            <div style="font-size:12px; color:#666; margin-top:4px;">
+              ${b.left} ${left}% · ${b.right} ${right}%
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 4) GA4 이벤트 (mbti 없으면 'na'로)
+    track('view_result', { mbti: mbti || 'na' });
+
+    // 5) A/B variant별 CTA
+    const variant = getVariant();
+    const ctaLabel = variant === 'B'
+      ? "이 성향에 맞는 데이트 코스 추천 받기"
+      : "HeartPin으로 데이트 코스 추천 받기";
+
+    document.getElementById('ctaArea').innerHTML = `
+      <button id="ctaBtn">${ctaLabel}</button>
+      <p style="color:#666;font-size:12px;margin-top:8px;">variant=${variant}</p>
+    `;
+
+    document.getElementById('ctaBtn').addEventListener('click', () => {
+      track('click_heartpin', { mbti: mbti || 'na', variant });
+
+      setTimeout(() => {
+        location.href = `https://example.com/heartpin?mbti=${encodeURIComponent(mbti || 'na')}&v=${variant}`;
+      }, 200);
+    });
+  </script>
+</body>
+</html>
+
+
+
