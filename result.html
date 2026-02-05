@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>결과</title>
 
+  <link rel="stylesheet" href="style.css" />
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFN9HYKG8Q"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,119 +15,225 @@
     gtag('config', 'G-SFN9HYKG8Q');
   </script>
 </head>
-<body>
-  <main class="wrap">
-    <section class="card">
-      <div class="center">
-        <h2 class="h2">결과</h2>
-        <p id="resultText" class="lead"></p>
 
-        <div id="ctaArea" class="ctaWrap" style="margin-top:14px;"></div>
-        <div id="variantHint" class="variantHint"></div>
+<body>
+  <main class="wrap result-page">
+
+    <!-- 분석 오버레이 -->
+    <div class="analyze-overlay" id="analyzeOverlay" aria-live="polite">
+      <div class="analyze-box">
+        <div class="spinner" id="spinner"></div>
+        <div class="check" id="check" style="display:none;">✓</div>
+        <div class="analyze-title" id="analyzeTitle">분석 중…</div>
+        <div class="analyze-sub" id="analyzeSub">결과를 계산하고 있어요</div>
+      </div>
+    </div>
+
+    <!-- 결과 카드 -->
+    <section class="card result-card" id="resultCard" style="display:none;">
+      <div class="madeby">made with young_cha</div>
+
+      <!-- 상단: 이미지 + 타이틀 -->
+      <div class="hero">
+        <div class="hero-img">
+          <img id="typeImg" alt="" />
+        </div>
+
+        <div class="result-head">
+          <div class="result-label">당신의 연애 MBTI</div>
+          <div class="result-type" id="typeMain"></div>
+          <div class="result-sub">핵심 키워드</div>
+        </div>
       </div>
 
-      <div id="mbtiBars" class="barList"></div>
+      <!-- 해시태그/설명 -->
+      <div class="hashtags" id="hashtags"></div>
+      <ul class="bullets" id="bullets"></ul>
+
+      <!-- 그래프 -->
+      <div class="graph">
+        <div class="graph-title">성향 그래프</div>
+        <div id="mbtiBars"></div>
+      </div>
+
+      <!-- CTA -->
+      <div id="ctaArea" class="ctaArea"></div>
+      <div class="ctaHint" id="variantHint"></div>
     </section>
   </main>
 
   <script src="app.js"></script>
   <script>
+    // app.js에 initExperiment, getVariant, track, calcWeightedMbti 등이 있다고 가정
     initExperiment();
 
-    // 1) MBTI 결과 가져오기
+    // 결과 데이터
     const mbti = sessionStorage.getItem("hp_mbti_v1");
-
-    // 2) 점수(score) 가져오기 (있으면)
     const scoreRaw = sessionStorage.getItem("hp_score_v1");
     const score = scoreRaw ? JSON.parse(scoreRaw) : null;
 
-    // 3) 결과 텍스트 출력
-    const resultEl = document.getElementById('resultText');
-
-    if (!mbti) {
-      resultEl.textContent = "테스트 결과를 찾을 수 없습니다. 다시 테스트를 진행해주세요.";
-    } else {
-      // score가 있으면 같이 보여주기 (선택)
-      if (score) {
-        resultEl.innerHTML = `
-          당신의 연애 MBTI는 <b>${mbti}</b> 입니다!<br/>
-        `;
-      } else {
-        resultEl.innerHTML = `당신의 연애 MBTI는 <b>${mbti}</b> 입니다!`;
+    // 유형별 콘텐츠(필요한 만큼 추가)
+    const PROFILES = {
+      INTJ: {
+        img: "assets/types/intj.png",
+        hashtags: ["#비전", "#사고", "#논쟁", "#경쟁", "#인정"],
+        bullets: [
+          "냉철한 판단과 자신의 이성을 믿는다",
+          "창의적이며 전략적인 사고가 빠른 편이다",
+          "어떤 것에 대해 먼저 의심부터 해본다",
+          "권위나 지위에 복종하지 않는다",
+          "비전을 세우고 계획하기 좋아한다"
+        ]
+      },
+      ENFP: {
+        img: "assets/types/enfp.png",
+        hashtags: ["#설렘", "#자유", "#즉흥", "#리액션", "#공감"],
+        bullets: [
+          "새로운 자극과 사람에게서 에너지를 얻는다",
+          "감정 표현이 솔직하고 리액션이 풍부하다",
+          "관계에 ‘재미’와 ‘의미’를 동시에 원한다",
+        ]
       }
-    }
-    if (score) {
-      const bars = [
-        { key: 'EI', left: 'E', right: 'I' },
-        { key: 'NS', left: 'N', right: 'S' },
-        { key: 'TF', left: 'T', right: 'F' },
-        { key: 'JP', left: 'J', right: 'P' },
-      ];
+    };
 
-      document.getElementById('mbtiBars').innerHTML = bars.map(b => {
-        const left = score[b.key][b.left];
-        const right = score[b.key][b.right];
-
-        return `
-          <div style="margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; font-size:13px;">
-              <span>${b.left}</span>
-              <span>${b.right}</span>
-            </div>
-            <div style="background:#eee; height:10px; border-radius:6px; overflow:hidden;">
-              <div style="
-                width:${left}%;
-                background:#e63946;
-                height:100%;
-              "></div>
-            </div>
-            <div style="font-size:12px; color:#666; margin-top:4px;">
-              ${b.left} ${left}% · ${b.right} ${right}%
-            </div>
-          </div>
-        `;
-      }).join('');
+    function getProfile(type) {
+      const fallback = {
+        img: "assets/logo.png",
+        hashtags: ["#연애", "#성향", "#MBTI"],
+        bullets: ["유형별 설명을 준비 중이에요 🙂"]
+      };
+      return (type && PROFILES[type]) ? PROFILES[type] : fallback;
     }
 
-    // 4) GA4 이벤트 (mbti 없으면 'na'로)
-    track('view_result', { mbti: mbti || 'na' });
+    // DOM
+    const overlay = document.getElementById('analyzeOverlay');
+    const resultCard = document.getElementById('resultCard');
+    const spinner = document.getElementById('spinner');
+    const check = document.getElementById('check');
+    const aTitle = document.getElementById('analyzeTitle');
+    const aSub = document.getElementById('analyzeSub');
 
-    // 5) A/B variant별 CTA
-    const variant = getVariant();
-    const ctaLabel = variant === 'B'
-      ? "이 성향에 맞는 데이트 코스 추천 받기"
-      : "HeartPin으로 데이트 코스 추천 받기";
+    const typeMain = document.getElementById('typeMain');
+    const typeImg = document.getElementById('typeImg');
+    const hashtagsEl = document.getElementById('hashtags');
+    const bulletsEl = document.getElementById('bullets');
+    const mbtiBarsEl = document.getElementById('mbtiBars');
 
-    document.getElementById('ctaArea').innerHTML = `
-      <button id="ctaBtn">${ctaLabel}</button>
-      <p style="color:#666;font-size:12px;margin-top:8px;">variant=${variant}</p>
-    `;
+    // 결과 없음 처리
+    if (!mbti) {
+      overlay.style.display = 'none';
+      resultCard.style.display = 'block';
 
-    document.getElementById('ctaBtn').addEventListener('click', () => {
-    const dest = new URL("https://naver.com");
-    dest.searchParams.set("mbti", mbti || "na");
-    dest.searchParams.set("v", variant);
+      typeMain.textContent = "결과 없음";
+      typeImg.style.display = "none";
 
-    // UTM
-    dest.searchParams.set("utm_source", "dating_mbti");
-    dest.searchParams.set("utm_medium", "cta");
-    dest.searchParams.set("utm_campaign", "ab_test");
+      hashtagsEl.innerHTML = `<span class="tag">#연애</span><span class="tag">#성향</span><span class="tag">#MBTI</span>`;
+      bulletsEl.innerHTML = `<li>테스트 결과를 찾을 수 없어요. 다시 진행해주세요 🙂</li>`;
+      mbtiBarsEl.innerHTML = `<div class="muted">그래프 데이터를 불러오지 못했어요.</div>`;
 
-    // GA 이벤트 -> 콜백에서 이동 (가장 깔끔)
-    gtag('event', 'click_heartpin', {
-      mbti: mbti || 'na',
-      variant,
-      destination: dest.toString(),
-      event_callback: () => { location.href = dest.toString(); },
-      event_timeout: 1200
-    });
+      document.getElementById('ctaArea').innerHTML = `
+        <a class="btn btn-primary" href="index.html">처음으로</a>
+      `;
+    } else {
+      // 콘텐츠 세팅
+      const profile = getProfile(mbti);
 
-    // 혹시 콜백이 안 오면 강제 이동(보험)
-    setTimeout(() => { location.href = dest.toString(); }, 1300);
-  });
+      typeMain.textContent = mbti;
+
+      typeImg.src = profile.img;
+      typeImg.alt = mbti;
+      typeImg.onerror = () => { typeImg.style.display = "none"; };
+
+      hashtagsEl.innerHTML = profile.hashtags.map(t => `<span class="tag">${t}</span>`).join("");
+      bulletsEl.innerHTML = profile.bullets.map(t => `<li>${t}</li>`).join("");
+
+      // 그래프
+      if (score) {
+        const bars = [
+          { key: 'EI', left: 'E', right: 'I', label: '에너지' },
+          { key: 'NS', left: 'N', right: 'S', label: '인식' },
+          { key: 'TF', left: 'T', right: 'F', label: '판단' },
+          { key: 'JP', left: 'J', right: 'P', label: '생활' },
+        ];
+
+        mbtiBarsEl.innerHTML = bars.map(b => {
+          const L = score[b.key][b.left];
+          const R = score[b.key][b.right];
+          return `
+            <div class="barRow">
+              <div class="barTop">
+                <span class="barLabel">${b.label}</span>
+                <span class="barPct">${b.left} ${L}% · ${b.right} ${R}%</span>
+              </div>
+              <div class="barTrack" role="img" aria-label="${b.left} ${L}%, ${b.right} ${R}%">
+                <div class="barFill" style="width:${L}%;"></div>
+              </div>
+              <div class="barEnds">
+                <span>${b.left}</span>
+                <span>${b.right}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        mbtiBarsEl.innerHTML = `<div class="muted">그래프 데이터를 불러오지 못했어요.</div>`;
+      }
+
+      // GA
+      track('view_result', { mbti: mbti || 'na' });
+
+      // CTA
+      const variant = getVariant();
+      const ctaLabel = variant === 'B'
+        ? "이 성향에 맞는 데이트 코스 추천 받기"
+        : "HeartPin으로 데이트 코스 추천 받기";
+
+      document.getElementById('ctaArea').innerHTML = `
+        <button class="btn btn-primary" id="ctaBtn">${ctaLabel}</button>
+        <button class="btn btn-secondary" id="retryBtn" type="button">테스트 다시하기</button>
+      `;
+      document.getElementById('variantHint').textContent = `variant=${variant}`;
+
+      document.getElementById('retryBtn').addEventListener('click', () => {
+        track('click_retry', { from: 'result', mbti: mbti || 'na', variant });
+        location.href = 'index.html';
+      });
+
+      document.getElementById('ctaBtn').addEventListener('click', () => {
+        const dest = new URL("https://naver.com");
+        dest.searchParams.set("mbti", mbti || "na");
+        dest.searchParams.set("v", variant);
+
+        dest.searchParams.set("utm_source", "dating_mbti");
+        dest.searchParams.set("utm_medium", "cta");
+        dest.searchParams.set("utm_campaign", "ab_test");
+
+        gtag('event', 'click_heartpin', {
+          mbti: mbti || 'na',
+          variant,
+          destination: dest.toString(),
+          event_callback: () => { location.href = dest.toString(); },
+          event_timeout: 1200
+        });
+        setTimeout(() => { location.href = dest.toString(); }, 1300);
+      });
+
+      // 분석 연출 타이밍
+      const SPIN_MS = 1800;
+      const CHECK_MS = 700;
+
+      setTimeout(() => {
+        spinner.style.display = 'none';
+        check.style.display = 'flex';
+        aTitle.textContent = '분석 완료!';
+        aSub.textContent = '결과를 확인해봐요';
+
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          resultCard.style.display = 'block';
+        }, CHECK_MS);
+      }, SPIN_MS);
+    }
   </script>
 </body>
 </html>
-
-
-

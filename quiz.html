@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>퀴즈</title>
 
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SFN9HYKG8Q"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,13 +19,38 @@
     gtag('config', 'G-SFN9HYKG8Q');
   </script>
 </head>
+
 <body>
-  <main style="max-width:720px;margin:40px auto;padding:0 16px;">
-    <h2>질문</h2>
-    <div id="qBox"></div>
-    <div style="margin-top:16px;">
-      <button id="nextBtn">다음</button>
+   <main class="quiz-page">
+    <!-- 상단 로고 -->
+    <div class="logo">
+      <img src="assets/logo.png" alt="HeartPin" />
     </div>
+
+    <!-- 상단 진행 영역 -->
+    <header class="topbar">
+      <button class="back-btn" id="backBtn" type="button" aria-label="이전 질문">
+        <span class="material-icons" aria-hidden="true">chevron_left</span>
+      </button>
+
+      <div class="progress-wrap" aria-hidden="true">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="counter" id="counter">1/12</div>
+    </header>
+
+    <!-- 질문/선택지 -->
+    <section class="content">
+      <div class="qnum" id="qNum">Q1.</div>
+      <div class="qtext" id="qText"></div>
+
+      <div class="choices" id="choices"></div>
+    </section>
+
+    <div class="byline">made with young_cha</div>
   </main>
 
   <script src="app.js"></script>
@@ -27,96 +58,140 @@
     initExperiment();
     track('view_quiz');
 
-    // 8문항: 각 축 2문항 고정
-    // 4지선다 선택지는 "왼쪽 성향 강/약" + "오른쪽 성향 약/강" 구조
-    // 가중치는 app.js의 WEIGHTS_4=[88, 62, 34, 16]로 자동 처리됨 (50:50 절대 불가)
-
+    // 8문항: 각 축 2문항 고정 
+    // 4지선다 선택지는 "왼쪽 성향 강/약" + "오른쪽 성향 약/강" 구조 
+    // 가중치는 app.js의 WEIGHTS_4=[88, 62, 34, 16]로 자동 처리됨 (50:50 절대 불가) 
+    
     const questions = [
-      // (E vs I)
+      // (E vs I) 
       { dim: "EI", q: "연인과 오랜만에 주말 하루를 통째로 보낼 수 있다. 당신이 생각하는 이상적인 데이트는?", 
-        leftChar: "E", rightChar: "I",
-        a: ["사람 많은 핫플을 돌아다니며, 에너지 넘치게 놀고 싶다",
+        leftChar: "E", rightChar: "I", 
+        a: ["사람 많은 핫플을 돌아다니며, 에너지 넘치게 놀고 싶다", 
             "새로운 장소를 가긴 하되, 사람이 너무 많은 곳은 피하고 싶다", 
             "조용한 카페나 산책 위주로 편안하게 시간을 보내고 싶다", 
-            "집이나 한적한 공간에서 둘만 오롯이 쉬는게 최고다."] 
-      },
+            "집이나 한적한 공간에서 둘만 오롯이 쉬는게 최고다."] }, 
       { dim: "EI", q: "연인과의 연락이나 만남 빈도에 대해 가장 가까운 생각은?", 
-        leftChar: "E", rightChar: "I",
-        a: ["보고 싶을 때마다 바로 연락하고 자주 만나는 게 좋다",
+        leftChar: "E", rightChar: "I", 
+        a: ["보고 싶을 때마다 바로 연락하고 자주 만나는 게 좋다", 
             "시간이 나면 연락하고 자주 보는 편이 좋다", 
             "필요할 때 중심으로 연락하고 만나는 게 편하다", 
-            "연락과 최소한으로, 만나기 전에만 연락하는게 좋다"] 
-      },
+            "연락은 최소한으로, 만나기 전에만 연락하는게 좋다"] }, 
+            
+        // (N vs S) 
+        { dim: "NS", q: "저기.. 번호 좀 줄래요? 연인이 상황극을 시도할 때 내 반응은?", 
+          leftChar: "N", rightChar: "S", 
+          a: ["저 남자(여자)친구 있어요~ 라며 능청스럽게 상황극을 끝까지 이어간다",
+              "웃으며 가볍게 받아주되, 너무 길게 끌지는 않는다.", 
+              "웃고 넘기긴 하는데, 바로 '무슨 일 있어?'처럼 현실 대화로 돌린다", 
+              "아 뭐하는거야. 굳이 상황극을 받지 않는다"] }, 
+        { dim: "NS", q: "연인의 말투나 행동이 평소와 달라졌다면, 나는?", 
+          leftChar: "N", rightChar: "S", 
+          a: ["연인의 말투 하나하나에도 의미부여하며, 잘못한 것이 없는지 되짚어본다", 
+              "관계나 감정에 변화가 있는 게 아닐까 마음 졸인다", 
+              "요즘 연인의 일정이나 상황을 생각하며 이해하려 노력한다", 
+              "구체적인 이유를 듣기 전까지 크게 의미를 부여하지 않는다"] }, 
+        
+        // TF (T vs F) 
+        { dim: "TF", q: "연인이 서운함을 말했을 때 나는?", 
+          leftChar: "T", rightChar: "F", 
+          a: ["'뭐가 그렇게 서운했어?' 서운함의 원인을 찾아 해결책을 생각한다", 
+              "'그게 왜 서운하지?' 라고 생각하지만, 이해하려고 노력한다", 
+              "'그랬을 수 있겠다.'라며 감정을 받아주고 이야기를 들어본다.", 
+              "'서운하게 해서 미안해.'라며 공감과 위로를 우선한다."] }, 
+        { dim: "TF", q: "연인과 영화를 보고 나왔을때 가장 먼저 보이는 반응은?", 
+          leftChar: "T", rightChar: "F", 
+          a: ["이 영화가 말하려는 메시지나 주제가 뭔지부터 얘기한다", 
+              "전개나 결말이 왜 그렇게 흘러갔는지를 생각하며 이야기한다", 
+              "재미있었는지, 어떤 장면이 인상 깊었는지 감상 위주로 이야기한다", 
+              "좋았는지 싫었는지와 같은 느낌부터 나눈다."] }, 
+        
+        // JP (J vs P) 
+        { dim: "JP", q: "연인과 여행을 가기 전 나의 준비 상태는?", 
+          leftChar: "J", rightChar: "P", 
+          a: ["일정/동선/예약까지 미리 다 표로 정리해서 연인에게 공유한다", 
+              "큰 일정과 핵심 포인트 위주로 정리해서 시간표를 짜둔다", 
+              "오고가는 시간만 정하고, 아무것도 미리 정하지 않는다", 
+              "우선 옷만 챙기고, 집을 나서며 즉흥적으로 여행을 간다"] }, 
+        { dim: "JP", q: "평일 저녁, '나 지금 보러가도 돼?'라며 갑작스레 온 연인의 연락, 당신의 반응은?", 
+          leftChar: "J", rightChar: "P", 
+          a: ["'응 당연히 되지!' 즉흥적인 연인의 스타일까지 반영해 계획을 짜두었다", 
+              "'아.. 오늘은 좀 힘들 것 같아.' 이미 계획해둔 휴식이나 일정이 있어 다음으로 미룬다", 
+              "'완전 좋지' 특별히 안될 이유가 없으면 흔쾌히 괜찮다고 이야기한다", 
+              "'나 이미 가고 있잖아.' 생각할 것도 없이 바로 준비해서 먼저 나간다"] }, 
+          ];
 
-      // (N vs S)
-      { dim: "NS", q: "저기.. 번호 좀 줄래요? 연인이 상황극을 시도할 때 내 반응은?", 
-        leftChar: "N", rightChar: "S",
-        a: ["저 남자(여자)친구 있어요~ 라며 능청스럽게 상황극을 끝까지 이어간다", 
-            "웃으며 가볍게 받아주되, 너무 길게 끌지는 않는다.", 
-            "웃고 넘기긴 하는데, 바로 '무슨 일 있어?'처럼 현실 대화로 돌린다", 
-            "아 뭐하는거야. 굳이 상황극을 받지 않는다"] 
-      },
-      { dim: "NS", q: "연인의 말투나 행동이 평소와 달라졌다면, 나는?", 
-        leftChar: "N", rightChar: "S",
-        a: ["연인의 말투 하나하나에도 의미부여하며, 잘못한 것이 없는지 되짚어본다",
-            "관계나 감정에 변화가 있는 게 아닐까 마음 졸인다", 
-            "요즘 연인의 일정이나 상황을 생각하며 이해하려 노력한다", 
-            "구체적인 이유를 듣기 전까지 크게 의미를 부여하지 않는다"] 
-      },
-
-      // TF (T vs F)
-      { dim: "TF", q: "연인이 서운함을 말했을 때 나는?", 
-        leftChar: "T", rightChar: "F",
-        a: ["'뭐가 그렇게 서운했어?' 서운함의 원인을 찾아 해결책을 생각한다", 
-            "'그게 왜 서운하지?' 라고 생각하지만, 이해하려고 노력한다", 
-            "'그랬을 수 있겠다.'라며 감정을 받아주고 이야기를 들어본다.", 
-            "'서운하게 해서 미안해.'라며 공감과 위로를 우선한다."] 
-      },
-      { dim: "TF", q: "연인과 영화를 보고 나왔을때 가장 먼저 보이는 반응은?", 
-        leftChar: "T", rightChar: "F",
-        a: ["이 영화가 말하려는 메시지나 주제가 뭔지부터 얘기한다",
-            "전개나 결말이 왜 그렇게 흘러갔는지를 생각하며 이야기한다",
-            "재미있었는지, 어떤 장면이 인상 깊었는지 감상 위주로 이야기한다", 
-            "좋았는지 싫었는지와 같은 느낌부터 나눈다."] 
-      },
-
-      // JP (J vs P)
-      { dim: "JP", q: "연인과 여행을 가기 전 나의 준비 상태는?", 
-        leftChar: "J", rightChar: "P",
-        a: ["일정/동선/예약까지 미리 다 표로 정리해서 연인에게 공유한다", 
-            "큰 일정과 핵심 포인트 위주로 정리해서 시간표를 짜둔다", 
-            "오고가는 시간만 정하고, 아무것도 미리 정하지 않는다", 
-            "우선 옷만 챙기고, 집을 나서며 즉흥적으로 여행을 간다"] 
-      },
-      { dim: "JP", q: "평일 저녁, '나 지금 보러가도 돼?'라며 갑작스레 온 연인의 연락, 당신의 반응은?", 
-        leftChar: "J", rightChar: "P",
-        a: ["'응 당연히 되지!' 즉흥적인 연인의 스타일까지 반영해 계획을 짜두었다", 
-            "'아.. 오늘은 좀 힘들 것 같아.' 이미 계획해둔 휴식이나 일정이 있어 다음으로 미룬다", 
-            "'완전 좋지' 특별히 안될 이유가 없으면 흔쾌히 괜찮다고 이야기한다", 
-            "'나 이미 가고 있잖아.' 생각할 것도 없이 바로 준비해서 먼저 나간다"] 
-      },
-    ];
+    
 
     let idx = 0;
     const picks = []; // 0~3 저장
+    let selected = null; // 현재 문항 선택
 
-    function render() {
-      const q = questions[idx];
-      document.getElementById('qBox').innerHTML = `
-        <p><b>${idx + 1}. ${q.q}</b></p>
-        ${q.a.map((t, i) => `
-          <label style="display:block;margin:10px 0;">
-            <input type="radio" name="ans" value="${i}"> ${t}
-          </label>
-        `).join('')}
-      `;
+    function shuffleCopy(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
     }
 
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      const picked = document.querySelector('input[name="ans"]:checked');
-      if (!picked) { alert("하나 선택해줘"); return; }
+    // 질문별 “섞인 보기 순서”를 저장해두는 캐시
+    // key: 질문 idx, value: [{text, orig}, ...] 4개
+    const optionCache = {};
 
-      const pickIdx = Number(picked.value); // 0~3
+    function updateTop() {
+      const total = questions.length;
+      const cur = idx + 1;
+      document.getElementById('counter').textContent = `${cur}/${total}`;
+      document.getElementById('qNum').textContent = `Q${cur}.`;
+      const pct = (cur / total) * 100;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+
+      // 첫 문항이면 back 비활성화
+      document.getElementById('backBtn').disabled = (idx === 0);
+    }
+
+    function render() {
+      selected = null;
+      const q = questions[idx];
+
+      document.getElementById('qText').textContent = q.q;
+
+      // 1) 이 질문에 대한 섞인 옵션이 이미 있으면 그대로 사용
+      // 2) 없으면 한 번만 섞어서 캐시에 저장
+      if (!optionCache[idx]) {
+        const options = q.a.map((text, orig) => ({ text, orig }));
+        optionCache[idx] = shuffleCopy(options);
+      }
+
+      const options = optionCache[idx]; // 고정된(캐시된) 보기 순서
+
+      const choicesEl = document.getElementById('choices');
+      choicesEl.innerHTML = options.map(opt => `
+        <label class="choice">
+          <!-- value는 반드시 원래 인덱스(0~3) -->
+          <input type="radio" name="ans" value="${opt.orig}" />
+          <span class="choice-card">
+            <span class="choice-text">${opt.text}</span>
+          </span>
+        </label>
+      `).join('');
+
+      // 선택하면 바로 다음으로
+      choicesEl.querySelectorAll('input[name="ans"]').forEach((el) => {
+        el.addEventListener('change', (e) => {
+          selected = Number(e.target.value); // 원래 인덱스
+          goNext();
+        });
+      });
+
+      updateTop();
+    }
+
+    function goNext() {
+      if (selected === null) return;
+
+      const pickIdx = selected; // 0~3
       picks.push(pickIdx);
 
       track('answer_question', { q_index: idx, pick: pickIdx });
@@ -124,21 +199,16 @@
       idx++;
 
       if (idx >= questions.length) {
-        // 답변 저장
         sessionStorage.setItem("hp_picks_v2", JSON.stringify(picks));
 
-        // MBTI 계산 (app.js 함수 사용)
         const { mbti, score } = calcWeightedMbti(picks, questions);
 
         sessionStorage.setItem("hp_mbti_v1", mbti);
         sessionStorage.setItem("hp_score_v1", JSON.stringify(score));
 
-        // 제출 이벤트
         track('submit_test', {
           mbti,
-          // 간단 요약: 0~3을 문자열로
           picks: picks.join(''),
-          // 점수 일부(원하면 더 보내도 됨)
           ei: `${score.EI.E}/${score.EI.I}`,
           ns: `${score.NS.N}/${score.NS.S}`,
           tf: `${score.TF.T}/${score.TF.F}`,
@@ -149,6 +219,14 @@
         return;
       }
 
+      render();
+    }
+
+    // 뒤로가기: 직전 답을 취소하고 이전 문항으로
+    document.getElementById('backBtn').addEventListener('click', () => {
+      if (idx === 0) return;
+      idx--;
+      picks.pop(); // 직전 답 제거
       render();
     });
 
