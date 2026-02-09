@@ -56,10 +56,38 @@ function calcWeightedMbti(picks, questions) {
   }
 
   function pickLetter(dimKey, leftChar, rightChar) {
-    const leftAvg = avg(bucket[dimKey]);         // ex) E 평균
-    const rightAvg = 100 - leftAvg;              // ex) I 평균
-    const letter = leftAvg > 50 ? leftChar : rightChar; // 50:50 불가능
-    return { letter, leftAvg: Number(leftAvg.toFixed(1)), rightAvg: Number(rightAvg.toFixed(1)) };
+    const arr = bucket[dimKey];     // leftPct들
+    const n = arr.length;
+
+    const sum = arr.reduce((a,b)=>a+b, 0);
+    const minSum = 16 * n;
+    const maxSum = 88 * n;
+
+    // 0~100으로 정규화 (올-왼쪽이면 100)
+    const leftScore = ((sum - minSum) / (maxSum - minSum)) * 100;
+
+    // 표시용(정수)
+    let leftPctShown = Math.round(leftScore);
+    let rightPctShown = 100 - leftPctShown;
+
+    // 판정(동일하게 단조 증가라 결과 동일)
+    // ✅ 판정 기준을 leftScore로 두는 게 더 일관적임
+    const letter = leftScore > 50 ? leftChar : rightChar;
+
+    // ✅ 50:50이면 letter 기준으로 51:49로 깨기
+    if (leftPctShown === 50 && rightPctShown === 50) {
+      if (letter === leftChar) {
+        leftPctShown = 51; rightPctShown = 49;
+      } else {
+        leftPctShown = 49; rightPctShown = 51;
+      }
+    }
+
+    return {
+      letter,
+      leftAvg: leftPctShown,
+      rightAvg: rightPctShown
+    };
   }
 
   const rEI = pickLetter("EI", "E", "I");
