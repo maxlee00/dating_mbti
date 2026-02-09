@@ -609,6 +609,7 @@ body{
   gap: 10px;
   margin-top: 18px;
   align-items:center;
+  margin-bottom: 32px;
 }
 .ctaHint{
   text-align:center;
