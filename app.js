@@ -91,3 +91,6 @@ if (ctaArea) {
     </button>
   `;
 }
+
+const matchBox = document.getElementById("matchBox");
+

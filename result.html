@@ -35,20 +35,33 @@
 
       <!-- 상단: 이미지 + 타이틀 -->
       <div class="hero">
-        <div class="hero-img">
-          <img id="typeImg" alt="" />
-        </div>
-
         <div class="result-head">
           <div class="result-label">당신의 연애 MBTI</div>
           <div class="result-type" id="typeMain"></div>
-          <div class="result-sub">핵심 키워드</div>
+          <div class="result-sub">상징 카드</div>
         </div>
       </div>
 
       <!-- 해시태그/설명 -->
       <div class="hashtags" id="hashtags"></div>
-      <ul class="bullets" id="bullets"></ul>
+      <div class="hero-img">
+          <img id="typeImg" alt="" />
+      </div>
+      <ul class="bullets" id="bullets"></ul>  
+
+      <div class="match" id="matchBox" style="display:none;">
+        <div class="match-card best">
+          <div class="match-badge">💖최고의 궁합</div>
+          <div class="match-type" id="bestType"></div>
+          <div class="match-desc" id="bestDesc"></div>
+        </div>
+
+        <div class="match-card worst">
+          <div class="match-badge">⚡주의 궁합</div>
+          <div class="match-type" id="worstType"></div>
+          <div class="match-desc" id="worstDesc"></div>
+        </div>
+      </div>
 
       <!-- 그래프 -->
       <div class="graph">
@@ -74,26 +87,341 @@
 
     // 유형별 콘텐츠(필요한 만큼 추가)
     const PROFILES = {
-      INTJ: {
-        img: "assets/types/intj.png",
-        hashtags: ["#비전", "#사고", "#논쟁", "#경쟁", "#인정"],
+      ENFJ: {
+        img: "assets/types/enfj.png",
+        hashtags: ["#신뢰"],
         bullets: [
-          "냉철한 판단과 자신의 이성을 믿는다",
-          "창의적이며 전략적인 사고가 빠른 편이다",
-          "어떤 것에 대해 먼저 의심부터 해본다",
-          "권위나 지위에 복종하지 않는다",
-          "비전을 세우고 계획하기 좋아한다"
-        ]
+          "눈치가 빨라 연인의 감정을 누구보다 먼저 알아채요.",
+          "연인의 장점을 발견하고 진심으로 응원해주는 타입이에요.",
+          "상처를 주고받는 상황을 싫어해 갈등을 미루는 경향이 있어요.",
+          "모두에게 다정하지만, 내 사람에게는 확실히 더 깊어요.",
+        ],
+        match: {
+          best: {
+            type: "ISTP",
+            desc: "합리적인 ISTP가 ENFJ의 \n감정 부담을 덜어줘요.",
+          },
+          worst: {
+            type: "ISTJ",
+            desc: "신중해서 알 수 없는 ISTJ 앞에서 \nENFJ는 혼자 애쓰는 느낌을 받기 쉬워요.",
+          },
+        },
       },
+
+      ESFP: {
+        img: "assets/types/esfp.png",
+        hashtags: ["#자유"],
+        bullets: [
+          "사랑에 빠지면 조건 없이 헌신하는 스타일이에요.",
+          "이벤트와 표현으로 애정을 적극적으로 보여줘요.",
+          "연인이 삶의 중심이 될 만큼 몰입도가 높은 편이에요.",
+          "사랑이 끝나면 미련 없이 정리하는 편이에요.",
+        ],
+        match: {
+          best: {
+            type: "INTJ",
+            desc: "조용하지만 단단한 INTJ가 자유로운 \nESFP를 안정적으로 붙잡아줘요.",
+          },
+          worst: {
+            type: "INTP",
+            desc: "무심한 INTP 앞에서 \nESFP는 외로움을 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      ESFJ: {
+        img: "assets/types/esfj.png",
+        hashtags: ["#친절"],
+        bullets: [
+          "기본적으로 다정해서 호감과 관심의 경계가 흐려질 때가 있어요.",
+          "연인의 감정을 잘 맞춰줘서 큰 갈등 없이 연애를 이어가요.",
+          "속으로는 연인의 행동에 관여하고 싶은 마음이 생기곤 해요.",
+          "갈등을 만들기 싫어서 불만을 쌓아두는 편이에요.",
+        ],
+        match: {
+          best: {
+            type: "INTP",
+            desc: "연애 자체를 즐기는 INTP의 태도가 \nESFJ가 과하게 애쓰지 않게 균형을 잡아줘요.",
+          },
+          worst: {
+            type: "ENTJ",
+            desc: "주도권을 놓지 않는 ENTJ와 만나면 \nESFJ는 점점 자신의 감정을 숨기게 돼요.",
+          },
+        },
+      },
+
       ENFP: {
         img: "assets/types/enfp.png",
-        hashtags: ["#설렘", "#자유", "#즉흥", "#리액션", "#공감"],
+        hashtags: ["#낭만"],
         bullets: [
-          "새로운 자극과 사람에게서 에너지를 얻는다",
-          "감정 표현이 솔직하고 리액션이 풍부하다",
-          "관계에 ‘재미’와 ‘의미’를 동시에 원한다",
-        ]
-      }
+          "어떤 상황이든 연인과 함께라면 OK인 낭만파예요.",
+          "사랑에 빠지면 계산 없이 화끈하게 올인하는 편이에요.",
+          "헌신적이지만 자기 자신도 잃지 않아서 크게 휘둘리진 않아요.",
+          "감정의 흐름과 설렘을 관계의 핵심으로 중요하게 여겨요.",
+        ],
+        match: {
+          best: {
+            type: "INFJ",
+            desc: "INFJ의 다정한 이해와 부드러운 리드가 \nENFP의 낭만을 현실 속에서 지켜줘요.",
+          },
+          worst: {
+            type: "ISFJ",
+            desc: "너무 성실한 ISFJ와 만나면 \nENFP는 감정을 숨겨야 한다고 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      INFP: {
+        img: "assets/types/infp.png",
+        hashtags: ["#로맨틱"],
+        bullets: [
+          "영화 같은 사랑을 늘 꿈꾸며 감정의 의미를 크게 느껴요.",
+          "연애 전에는 벽이 있지만, 시작하면 애정표현이 확 늘어요.",
+          "앞으로의 행복과 갈등까지 미리 상상하며 감정에 몰입하는 편이에요.",
+          "상처를 받으면 혼자 끌어안고 오래 곱씹는 경향이 있어요.",
+        ],
+        match: {
+          best: {
+            type: "ISFP",
+            desc: "진솔한 대화를 좋아하는 ISFP가 \nINFP의 깊은 감정을 편안히 받아줘요.",
+          },
+          worst: {
+            type: "ESFP",
+            desc: "사랑의 불도저 ESFP에게 \nINFP는 감정이 휩쓸린다고 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      INFJ: {
+        img: "assets/types/infj.png",
+        hashtags: ["#스킨십"],
+        bullets: [
+          "물리적 거리가 가까울수록 애정의 크기도 커지는 편이에요.",
+          "표현이 서툴러서 짝사랑과 속앓이를 자주 해요.",
+          "표정관리를 잘해서 마음을 들키지 않는 경우가 많아요.",
+          "연애를 시작하면 방해하는 장애물을 밀어내며 올인해요.",
+        ],
+        match: {
+          best: {
+            type: "ESFP",
+            desc: "ESFP의 불도저 같은 사랑이 \nINFJ의 숨겨둔 마음을 자연스럽게 열어줘요.",
+          },
+          worst: {
+            type: "ESTJ",
+            desc: "감정보다 기준이 앞서는 ESTJ 앞에서 \nINFJ는 보이지 않는 벽을 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      ISFP: {
+        img: "assets/types/isfp.png",
+        hashtags: ["#신중"],
+        bullets: [
+          "연애에 쉽게 빠지지 않고 시작 전까지 아주 신중한 편이에요.",
+          "진심을 주고받는 관계를 가장 중요하게 생각해요.",
+          "공감력이 좋아서 연인의 취향과 감정을 잘 존중해줘요.",
+          "상대에게 맞추다 보면 스스로를 소홀히 할 때가 있어요.",
+        ],
+        match: {
+          best: {
+            type: "ENTJ",
+            desc: "ENTJ의 확신 있는 리드가 \nISFP에게 안정감과 결단을 만들어줘요.",
+          },
+          worst: {
+            type: "ENTP",
+            desc: "자기애가 강한 ENTP 앞에서 \nISFP는 점점 마음이 식을 수 있어요.",
+          },
+        },
+      },
+
+      ISFJ: {
+        img: "assets/types/isfj.png",
+        hashtags: ["#평화"],
+        bullets: [
+          "나의 노력을 알아주고 감사해주는 사람과 오래 연애해요.",
+          "갈등을 피하고 평화를 지키려 끝까지 참고 맞추는 편이에요.",
+          "사랑을 아낌없이 주는 만큼 확신을 받고 싶어 해요.",
+          "때때로 상대의 사랑을 확인받고 싶은 마음이 올라와요.",
+        ],
+        match: {
+          best: {
+            type: "ESTP",
+            desc: "ESTP의 밝고 통통 튀는 매력이 \nISFJ에게 생기를 더해줘요.",
+          },
+          worst: {
+            type: "ENFP",
+            desc: "과한 에너지의 ENFP와 만나면 \nISFJ는 지치거나 불안해지기 쉬워요.",
+          },
+        },
+      },
+
+      ENTP: {
+        img: "assets/types/entp.png",
+        hashtags: ["#자기애"],
+        bullets: [
+          "개인의 시간과 자유를 중요하게 여기며 자기애가 강한 편이에요.",
+          "상상력이 풍부해서 계획 없이도 훌쩍 튀는 매력이 있어요.",
+          "호불호가 분명하고 싫증이 빨라 새로운 자극을 좋아해요.",
+          "감정적일 것 같지만 실제로는 논리적으로 팩트를 짚는 타입이에요.",
+        ],
+        match: {
+          best: {
+            type: "ISFJ",
+            desc: "다 잘 맞춰주는 ISFJ가 \nENTP의 자유로운 변덕을 편안하게 감싸줘요.",
+          },
+          worst: {
+            type: "ISFP",
+            desc: "진심을 꾸준히 확인받고 싶은 ISFP에게 \nENTP는 차갑게 느껴질 수 있어요.",
+          },
+        },
+      },
+
+      ENTJ: {
+        img: "assets/types/entj.png",
+        hashtags: ["#리더"],
+        bullets: [
+          "연애에서도 주도권을 잡고 관계를 이끄는 편이에요.",
+          "연인이 고민하면 빠르게 해결책을 제시해주려고 해요.",
+          "단호하고 이성적인 모습이 때론 가르치려는 느낌으로 보일 수 있어요.",
+          "소유욕이 강한 편이라 상대를 확실히 ‘내 편’으로 만들고 싶어 해요.",
+        ],
+        match: {
+          best: {
+            type: "ISFP",
+            desc: "ISFP의 부드러운 감성이 \nENTJ의 강한 리더십을 따뜻하게 감싸줘요.",
+          },
+          worst: {
+            type: "ISFJ",
+            desc: "맞춰주기만 하는 ISFJ와 만나면 ENTJ는 \n더 강해지지만 ISFJ는 더 지치기 쉬워요.",
+          },
+        },
+      },
+
+      ESTP: {
+        img: "assets/types/estp.png",
+        hashtags: ["#사교성"],
+        bullets: [
+          "이상형을 만나면 추진력 있게 연애까지 빠르게 직진해요.",
+          "애정표현과 스킨십에 적극적이고 솔직한 편이에요.",
+          "갈등이 생겨도 피하지 않아서 뒤끝이 길지 않아요.",
+          "자기주장이 강하고 충동적으로 확 쏠릴 때가 있어요.",
+        ],
+        match: {
+          best: {
+            type: "INFJ",
+            desc: "INFJ의 깊은 공감이 ESTP의 \n직진 에너지를 의미 있는 방향으로 잡아줘요.",
+          },
+          worst: {
+            type: "INFP",
+            desc: "감정의 속도가 다른 INFP에게 \nESTP는 너무 거칠게 느껴질 수 있어요.",
+          },
+        },
+      },
+
+      ESTJ: {
+        img: "assets/types/estj.png",
+        hashtags: ["#철저"],
+        bullets: [
+          "시간, 돈, 약속까지 모든 걸 계획적으로 관리하는 편이에요.",
+          "밀당 없이 직설적으로 표현하며 관계를 깔끔하게 정리해요.",
+          "책임감이 강해서 약속을 반드시 지키고 신뢰를 쌓아요.",
+          "연애도 사랑도 ‘배우고 개선’하는 노력형이라 갈수록 표현이 늘어요.",
+        ],
+        match: {
+          best: {
+            type: "INFP",
+            desc: "INFP의 따뜻한 감정이 \nESTJ의 철저한 기준 속에 여유를 만들어줘요.",
+          },
+          worst: {
+            type: "INFJ",
+            desc: "먼저 다가오지 않는 INFJ 앞에서 \nESTJ는 답답함을 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      INTJ: {
+        img: "assets/types/intj.png",
+        hashtags: ["#비밀"],
+        bullets: [
+          "연애도 인생 프로젝트처럼 접근해서 감정이 있어도 바로 표현하지 않아요.",
+          "가치관이 맞지 않으면 관심을 쉽게 두지 않아요.",
+          "혼자 생각하는 시간이 필요하지만 설명이 부족해 오해를 사기도 해요.",
+          "시작은 느릴 수 있지만 한 번 사랑하면 매우 깊게 사랑해요.",
+        ],
+        match: {
+          best: {
+            type: "ENFP",
+            desc: "귀여운 강아지 같은 ENFP의 따뜻함과 \n솔직함이 INTJ를 부드럽게 풀어줘요.",
+          },
+          worst: {
+            type: "INTJ",
+            desc: "서로 마음을 숨기다 보니 관계가 \n쉽게 정체되고 거리감이 커지기 쉬워요.",
+          },
+        },
+      },
+
+      INTP: {
+        img: "assets/types/intp.png",
+        hashtags: ["#COOL"],
+        bullets: [
+          "간섭받는 걸 싫어하고 선을 넘는 순간 확 거리두는 편이에요.",
+          "솔직하지만 반응이 적어서 무심하게 보일 수 있어요.",
+          "기존 연애 방식보다 나만의 룰로 관계를 만들고 싶어 해요.",
+          "외모나 조건보다 대화와 사고방식이 맞는지를 더 중요하게 봐요.",
+        ],
+        match: {
+          best: {
+            type: "ENFJ",
+            desc: "ENFJ의 따뜻한 리액션과 감정 표현이 \nINTP가 관계 속에 편하게 머물 수 있게 도와줘요.",
+          },
+          worst: {
+            type: "INFJ",
+            desc: "감정 교류를 꾸준히 원하는 INFJ에게 \nINTP는 차갑고 멀게 느껴질 수 있어요.",
+          },
+        },
+      },
+
+      ISTP: {
+        img: "assets/types/istp.png",
+        hashtags: ["#합리적"],
+        bullets: [
+          "연애에서도 기준과 선이 합리적이고 명확한 편이에요.",
+          "저돌적이기보단 단계를 밟아가는 사랑을 선호해요.",
+          "사생활과 혼자 있는 시간이 부족하면 스트레스를 받아요.",
+          "애정표현이 소극적이라 좋아해도 티가 잘 안 날 때가 있어요.",
+        ],
+        match: {
+          best: {
+            type: "ESFJ",
+            desc: "ESFJ의 안정적인 신뢰와 배려가 \nISTP가 감정을 드러내도 괜찮다고 느끼게 해줘요.",
+          },
+          worst: {
+            type: "ESFP",
+            desc: "너무 자유롭고 즉흥적인 ESFP 앞에서 \nISTP는 통제 불가한 피로감을 느끼기 쉬워요.",
+          },
+        },
+      },
+
+      ISTJ: {
+        img: "assets/types/istj.png",
+        hashtags: ["#제어"],
+        bullets: [
+          "꼼꼼하고 철두철미해서 연애도 계획적으로 차근차근 진행해요.",
+          "감정 표현은 서툴지만 내적 사랑은 깊게 쌓이는 타입이에요.",
+          "신중해서 시작이 느릴 수 있고, 연애 티가 잘 안 날 때도 있어요.",
+          "감정의 선을 잘 지켜서 연애 기간이 길어지는 편이에요.",
+        ],
+        match: {
+          best: {
+            type: "ENFP",
+            desc: "해피 바이러스 ENFP의 밝은 에너지가 \nISTJ의 단단한 일상에 설렘을 불어넣어줘요.",
+          },
+          worst: {
+            type: "INFP",
+            desc: "감정의 파도가 큰 INFP와 만나면 ISTJ는 \n계속 조절하고 맞춰야 한다고 느끼기 쉬워요.",
+          },
+        },
+      },
     };
 
     function getProfile(type) {
@@ -103,6 +431,13 @@
         bullets: ["유형별 설명을 준비 중이에요 🙂"]
       };
       return (type && PROFILES[type]) ? PROFILES[type] : fallback;
+    }
+
+    function render() {
+      document.getElementById("bestDesc").innerHTML =
+        profile.match.best.desc.replace(/\n/g, "<br>");
+      document.getElementById("worstDesc").innerHTML =
+        profile.match.worst.desc.replace(/\n/g, "<br>");
     }
 
     // DOM
@@ -122,7 +457,7 @@
     // 결과 없음 처리
     if (!mbti) {
       overlay.style.display = 'none';
-      resultCard.style.display = 'block';
+      resultCard.style.display = 'block';   
 
       typeMain.textContent = "결과 없음";
       typeImg.style.display = "none";
@@ -146,6 +481,23 @@
 
       hashtagsEl.innerHTML = profile.hashtags.map(t => `<span class="tag">${t}</span>`).join("");
       bulletsEl.innerHTML = profile.bullets.map(t => `<li>${t}</li>`).join("");
+
+      const matchBox = document.getElementById("matchBox");
+      if (matchBox && profile.match) {
+        matchBox.style.display = "grid";
+        document.getElementById("bestType").textContent = profile.match.best.type;
+        document.getElementById("worstType").textContent = profile.match.worst.type;
+        const bestDescEl = document.getElementById("bestDesc");
+        const worstDescEl = document.getElementById("worstDesc");
+
+        bestDescEl.textContent =
+          profile.match.best.desc.replace(/\\n/g, "\n");
+
+        worstDescEl.textContent =
+          profile.match.worst.desc.replace(/\\n/g, "\n");
+      } else if (matchBox) {
+        matchBox.style.display = "none";
+      }
 
       // 그래프
       if (score) {
@@ -200,7 +552,7 @@
       });
 
       document.getElementById('ctaBtn').addEventListener('click', () => {
-        const dest = new URL("https://naver.com");
+        const dest = new URL("https://embeddedgrammer-heartpin.hf.space/");
         dest.searchParams.set("mbti", mbti || "na");
         dest.searchParams.set("v", variant);
 
@@ -231,6 +583,8 @@
         setTimeout(() => {
           overlay.style.display = 'none';
           resultCard.style.display = 'block';
+
+          if (hashtagsEl) hashtagsEl.style.display = "none";
         }, CHECK_MS);
       }, SPIN_MS);
     }

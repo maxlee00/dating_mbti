@@ -262,7 +262,6 @@ body{
   overflow-wrap: break-word; /* 너무 긴 문자열(영문/URL)만 예외적으로 줄바꿈 */
 }
 
-/* 선택지(4개) */
 .choices{
   width: 100%;
   display:flex;
@@ -744,4 +743,70 @@ body{
 
 .btn-secondary:hover{
   background:#e9e9e9;
+}
+
+/* 궁합 영역 */
+.match {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+/* 궁합 카드 공통 */
+.match-card {
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+/* 배지 */
+.match-badge {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* 유형 텍스트 */
+.match-type {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+/* 설명 */
+.match-desc {
+  white-space: pre-line !important;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #555;
+}
+
+/* 최고의 궁합 */
+.match-card.best {
+  background: #fff0f5;
+}
+.match-card.best .match-type {
+  color: #ff5c8a;
+}
+
+/* 주의 궁합 */
+.match-card.worst {
+  background: #f7f7f7;
+}
+.match-card.worst .match-type {
+  color: #666;
+}
+
+.result-card .hero-img {
+  width: 300px;
+  max-width: 90%;
+  margin: 14px auto 10px;
+}
+
+.result-card .hero-img img {
+  width: 100%;
+  height: auto;
 }
