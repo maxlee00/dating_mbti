@@ -811,3 +811,8 @@ body{
   width: 100%;
   height: auto;
 }
+
+.ctaHint {
+  font-size: 8px;
+  opacity: 0.3;
+}
