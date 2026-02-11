@@ -108,17 +108,6 @@ function calcWeightedMbti(picks, questions) {
   };
 }
 
-const ctaArea = document.getElementById('ctaArea');
-if (ctaArea) {
-  ctaArea.innerHTML = `
-    <button class="btn btn-primary" id="ctaBtn">
-      이 성향에 맞는 데이트 코스 추천 받기
-    </button>
-    <button class="btn btn-secondary" id="retryBtn" type="button">
-      테스트 다시하기
-    </button>
-  `;
-}
 
 const matchBox = document.getElementById("matchBox");
 

@@ -458,7 +458,7 @@
     // 결과 없음 처리
     if (!mbti) {
       overlay.style.display = 'none';
-      resultCard.style.display = 'block';   
+      resultCard.style.display = 'block';  
 
       typeMain.textContent = "결과 없음";
       typeImg.style.display = "none";
@@ -589,6 +589,43 @@
         }, CHECK_MS);
       }, SPIN_MS);
     }
+    
+    function renderCTA(variant, mbti) {
+      const ctaArea = document.getElementById("ctaArea");
+      const hint = document.getElementById("variantHint");
+      if (!ctaArea) return;
+
+      // variant 힌트(디버깅용) — 나중에 숨겨도 됨
+      if (hint) hint.textContent = `variant=${variant}`;
+
+      if (variant === "A") {
+        ctaArea.innerHTML = `
+          <button class="btn btn-primary" id="ctaBtn">
+            HeartPin으로 데이트 코스 추천 받기
+          </button>
+          <button class="btn btn-secondary" id="retryBtn" type="button">
+            테스트 다시하기
+          </button>
+        `;
+      } else {
+        // B는 "더 직관/즉시성" 컨셉 예시
+        ctaArea.innerHTML = `
+          <button class="btn btn-primary" id="ctaBtn">
+            지금 내 연애 성향에 맞는 코스 확인하기
+          </button>
+          <button class="btn btn-secondary" id="retryBtn" type="button">
+            다시 테스트하기
+          </button>
+        `;
+      }
+
+      // 버튼 이벤트 연결 (A/B 공통)
+      document.getElementById("ctaBtn")?.addEventListener("click", () => {
+        track("click_cta", { mbti, variant });
+        location.href = "https://embeddedgrammer-heartpin.hf.space/";
+      });
+    }
+
   </script>
 </body>
 </html>
