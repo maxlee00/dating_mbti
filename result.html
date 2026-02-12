@@ -552,7 +552,9 @@
         location.href = 'index.html';
       });
 
-      document.getElementById('ctaBtn').addEventListener('click', () => {
+      document.getElementById('ctaBtn')?.addEventListener('click', (e) => {
+        e.preventDefault(); // 즉시 이동 막기
+
         const dest = new URL("https://embeddedgrammer-heartpin.hf.space/");
         dest.searchParams.set("mbti", mbti || "na");
         dest.searchParams.set("v", variant);
@@ -561,15 +563,20 @@
         dest.searchParams.set("utm_medium", "cta");
         dest.searchParams.set("utm_campaign", "ab_test");
 
-        gtag('event', 'click_heartpin', {
-          mbti: mbti || 'na',
-          variant,
-          destination: dest.toString(),
-          event_callback: () => { location.href = dest.toString(); },
-          event_timeout: 1200
+        const finalUrl = dest.toString();
+
+        // GA 이벤트 (variant 자동 포함됨)
+        track("click_cta", {
+          mbti: mbti || "na",
+          destination: finalUrl
         });
-        setTimeout(() => { location.href = dest.toString(); }, 1300);
+
+        // 이벤트 전송 시간 확보 후 이동
+        setTimeout(() => {
+          window.location.href = finalUrl;
+        }, 200); // 150~250ms 권장
       });
+
 
       // 분석 연출 타이밍
       const SPIN_MS = 1300;
